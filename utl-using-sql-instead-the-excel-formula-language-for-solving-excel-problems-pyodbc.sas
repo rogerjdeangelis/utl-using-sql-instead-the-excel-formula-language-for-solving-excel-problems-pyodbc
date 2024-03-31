@@ -12,8 +12,8 @@ ONLY PYODBC PROPERLY SUPPORTS SQL 'CREATE TABLE' INSIDE EXCEL
 
  FOUR SOLUTIONS  (sheet names and named ranges can be used interchangeably)
 
-   1. join sheets:   create new sheet(join_sheets) by joining sheet1 and sheet2 by age
-   2. join ranges    create new sheet(join_ranges) and range(join_ranges) by joining range1 and range2 by age
+   1. join sheets:   create new sheet(join_sheets) by concatenating and summarizing sheets
+   2. join ranges    create new sheet(join_ranges) and range(join_ranges) by concatenating and summarizing sheets
 
    3. concat sheets: create sheet(concat_sheets)  by concating sheet1 and sheet2 and summarizing student ages by sex
                      This works with shhet name or named ranges
