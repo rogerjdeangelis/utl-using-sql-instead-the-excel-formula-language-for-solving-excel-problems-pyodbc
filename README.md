@@ -1,5 +1,3 @@
-# utl-using-sql-instead-the-excel-formula-language-for-solving-excel-problems-pyodbc
-Creating skilled excel programmers out out of skilled ansi sql programmers
     %let pgm=utl-using-sql-instead-the-excel-formula-language-for-solving-excel-problems-pyodbc;
 
     Creating skilled excel programmers out out of skilled ansi sql programmers
@@ -14,13 +12,14 @@ Creating skilled excel programmers out out of skilled ansi sql programmers
 
      FOUR SOLUTIONS  (sheet names and named ranges can be used interchangeably)
 
-       1. join sheets:   create new sheet(join_sheets) by concatenating and summarizing sheets
-       2. join ranges    create new sheet(join_ranges) and range(join_ranges) by concatenating and summarizing sheets
+       1. join sheets:   create new sheet(join_sheets) by joining sheet1 and sheet2 by age
+       2. join ranges    create new sheet(join_ranges) and range(join_ranges) by joining range1 and range2 by age
 
-       3. concat sheets: create sheet(concat_sheets)  by concating sheet1 and sheet2 a 
-                         This works with sheet name or named ranges
+       3. concat sheets: create sheet(concat_sheets)  by concating sheet1 and sheet2 and summarizing student ages by sex
+                         This works with shhet name or named ranges
 
        4. inline data:   creating and populating a sheet
+       5. inner join:    select male name and female name from innerjoin of males and females by age
 
      Python package pyodbc seems more powerfull than r packages ODBC, RODBC or RODBCDBI.
      In particulat I wanted the sql 'CREATE TABLE' statement to maintain pure sql.
@@ -149,6 +148,47 @@ Creating skilled excel programmers out out of skilled ansi sql programmers
     /*                                                  |  conn.close()                                              3 |Alexi  |F    |14   | */
     /*                                                  |  ;;;;                                                        |-------+-----+-----+ */
     /*                                                  |  %utl_pyend;                                                 [pop_sheet]           */
+    /*                                                  |                                                                                    */
+    /*                                                  |                                                                                    */
+    /*                                                  |                                                                                    */
+    /*                                                  |  5. INNER JOIN                                                                     */
+    /*                                                  |                                                                                    */
+    /*                                                  |  %inc "c:/utl/utl_mkeodbc.sas" / nosource; creates input                           */
+    /*                                                  |                                                                                    */
+    /*                                                  |  %utl_pybegin;                                                                     */
+    /*                                                  |  parmcards4;                                                                       */
+    /*                                                  |  import pyodbc                                                                     */
+    /*                                                  |  import pandas as pd                                                               */
+    /*                                                  |  conn_str = (                                                                      */
+    /*                                                  |   r'Driver={Microsoft Excel Driver (*.xls, *.xlsx, *.xlsm, *.xlsb)};'              */
+    /*                                                  |   r'DBQ=d:/xls/have.xlsx;'                                                         */
+    /*                                                  |   r'ReadOnly=0;'                                                                   */
+    /*                                                  |  );                                                                                */
+    /*                                                  |  conn = pyodbc.connect(conn_str, autocommit=True)                                  */
+    /*                                                  |  cursor = conn.cursor()                                                            */
+    /*                                                  |  cursor.execute("""CREATE TABLE mean_age                                           */
+    /*                                                  |     (m_name varchar(255),f_name varchar(255), age numeric)""")                     */
+    /*                                                  |  query = """                                                                       */
+    /*                                                  |    insert into mean_age                                                            */
+    /*                                                  |    select                                                                          */
+    /*                                                  |       f_name                                                OUTPUT (INNER JOIN)    */
+    /*                                                  |      ,m_name                                                                       */
+    /*                                                  |      ,age                                                  +--------------------+  */
+    /*                                                  |    from                                                    |  A    |  B    | C  |  */
+    /*                                                  |      ( select                                              +---------------------  */
+    /*                                                  |          m.name as f_name                                1 |M_NAME |M_NAME |AGE |  */
+    /*                                                  |         ,f.name as m_name                                  |-------+-------+----+  */
+    /*                                                  |         ,m.age                                           2 |Alfred |Barbara| 13 |  */
+    /*                                                  |       from                                                 |-------+-------+----+  */
+    /*                                                  |          males as m inner join females as f              3 |Alex   |Carol  | 14 |  */
+    /*                                                  |       on                                                   |-------+-------+----+  */
+    /*                                                  |          m.age = f.age)                                    [INNER_JOIN]            */
+    /*                                                  |  """                                                                               */
+    /*                                                  |  cursor.execute(query)                                                             */
+    /*                                                  |  conn.commit()                                                                     */
+    /*                                                  |  conn.close()                                                                      */
+    /*                                                  |  ;;;;                                                                              */
+    /*                                                  |  %utl_pyend;                                                                       */
     /*                                                  |                                                                                    */
     /*                                                  |                                                                                    */
     /*****************************************************************************************************************************************/
@@ -504,6 +544,68 @@ Creating skilled excel programmers out out of skilled ansi sql programmers
     /*                                                                                                                        */
     /**************************************************************************************************************************/
 
+    /*___    _                           _       _
+    | ___|  (_)_ __  _ __   ___ _ __    (_) ___ (_)_ __
+    |___ \  | | `_ \| `_ \ / _ \ `__|   | |/ _ \| | `_ \
+     ___) | | | | | | | | |  __/ |      | | (_) | | | | |
+    |____/  |_|_| |_|_| |_|\___|_|     _/ |\___/|_|_| |_|
+                                      |__/
+    */
+
+    %inc "c:/utl/utl_mkeodbc.sas" / nosource; creates input
+
+    %utl_pybegin;
+    parmcards4;
+    import pyodbc
+    import pandas as pd
+    conn_str = (
+     r'Driver={Microsoft Excel Driver (*.xls, *.xlsx, *.xlsm, *.xlsb)};'
+     r'DBQ=d:/xls/have.xlsx;'
+     r'ReadOnly=0;'
+    );
+    conn = pyodbc.connect(conn_str, autocommit=True)
+    cursor = conn.cursor()
+    cursor.execute("""CREATE TABLE mean_age
+       (m_name varchar(255),f_name varchar(255), age numeric)""")
+    query = """
+      insert into mean_age
+      select
+         f_name
+        ,m_name
+        ,age
+      from
+        ( select
+            m.name as f_name
+           ,f.name as m_name
+           ,m.age
+         from
+            males as m inner join females as f
+         on
+            m.age = f.age)
+    """
+    cursor.execute(query)
+    conn.commit()
+    conn.close()
+    ;;;;
+    %utl_pyend;
+
+    /**************************************************************************************************************************/
+    /*                                                                                                                        */
+    /*                                                                                                                        */
+    /*     OUTPUT (INNER JOIN)                                                                                                */
+    /*                                                                                                                        */
+    /*    +--------------------+                                                                                              */
+    /*    |  A    |  B    | C  |                                                                                              */
+    /*    +---------------------                                                                                              */
+    /*  1 |M_NAME |M_NAME |AGE |                                                                                              */
+    /*    |-------+-------+----+                                                                                              */
+    /*  2 |Alfred |Barbara| 13 |                                                                                              */
+    /*    |-------+-------+----+                                                                                              */
+    /*  3 |Alex   |Carol  | 14 |                                                                                              */
+    /*    |-------+-------+----+                                                                                              */
+    /*    [INNER_JOIN]                                                                                                        */
+    /*                                                                                                                        */
+    /**************************************************************************************************************************/
 
 
     /*              _
