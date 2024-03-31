@@ -14,11 +14,11 @@ Creating skilled excel programmers out out of skilled ansi sql programmers
 
      FOUR SOLUTIONS  (sheet names and named ranges can be used interchangeably)
 
-       1. join sheets:   create new sheet(join_sheets) by joining sheet1 and sheet2 by age
-       2. join ranges    create new sheet(join_ranges) and range(join_ranges) by joining range1 and range2 by age
+       1. join sheets:   create new sheet(join_sheets) by concatenating and summarizing sheets
+       2. join ranges    create new sheet(join_ranges) and range(join_ranges) by concatenating and summarizing sheets
 
-       3. concat sheets: create sheet(concat_sheets)  by concating sheet1 and sheet2 and summarizing student ages by sex
-                         This works with shhet name or named ranges
+       3. concat sheets: create sheet(concat_sheets)  by concating sheet1 and sheet2 a 
+                         This works with sheet name or named ranges
 
        4. inline data:   creating and populating a sheet
 
